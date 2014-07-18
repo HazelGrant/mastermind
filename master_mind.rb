@@ -32,15 +32,45 @@ while turn < 12
   dup_guess = guess.dup 
 
   result = []
+  correct_color = 0
+  black = 0
+  white = 0
 
-  dup_guess.each_with_index do |peg, index| #this is not quite right
-    if code[index] == peg
-      result << " + "
-      peg = "marked"
-    elsif code.include?(peg)
-      result << " - "
-      peg = "marked"
+  guess_duplicates = Hash.new(0)
+  guess.each { |e| guess_duplicates[e] += 1 }
+
+  code_duplicates = Hash.new(0)
+  code.each { |e| code_duplicates[e] += 1 }
+
+  code_duplicates.each do |key, value|
+    if guess_duplicates.has_key?(key)
+      if guess_duplicates[key] > code_duplicates[key]
+        correct_color += code_duplicates[key].to_i
+      elsif guess_duplicates[key] < code_duplicates[key]
+        correct_color += guess_duplicates[key].to_i
+      elsif guess_duplicates[key] == code_duplicates[key]
+        correct_color += guess_duplicates[key].to_i
+      end
     end
+  end
+
+  counter = 0
+
+  while counter < guess.length
+    if guess[counter] == code[counter]
+      black += 1
+    end
+    counter += 1
+  end
+
+  white = correct_color - black
+
+  white.times do
+    result.push(" - ")
+  end
+
+  black.times do 
+    result.push(" + ")
   end
 
   puts result.shuffle.join(" ")
